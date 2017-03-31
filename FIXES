@@ -1,0 +1,8 @@
+  FIXES FOR NEXT ITERATIONS:
+
+ - Must fix the text to print onto the corner of the screen regardless of the canvas size 
+ - Make sure the scale is correct at the moment (1 pixel = 1 kilometer)
+ - Add forces of gravity 
+ - Find a way to draw orbital lines ahead of the moon and asteroid orbit
+ - Find a way to scale everything out 
+ 
