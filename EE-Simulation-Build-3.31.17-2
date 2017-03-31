@@ -1,0 +1,129 @@
+// each pixel = 1 km
+// 1 = 1km
+// 1/s = 1km / s
+
+PVector aPos, aVel;      // asteroid pos and vel
+PVector mPos, mVel;      // moon pos and vel
+PVector finalVel;        // final velocity after collision
+
+float aMass = 1.18e17;     // asteroid mass
+float mMass = 0.07346e24;  // moon mass
+
+float p, KE;             // momentum and K.E
+float KEOLD;             // initial K.E
+float KENEW = 0;         // new K.E after collision
+float DELTAKE;           // change in kinetic energy 
+float dt = 0.00001;      // time step before collision (seconds)
+float dt2 = 1;           // time step after collision (seconds)
+
+float mVelMag;           // velocity of moon magnitude (meters / second)
+float aVelMag;           // velocity of asteroid magnitude (meters / second)
+boolean collision = false; // checks for collision
+boolean goOnce = false;    // makes sure to save keOLD once
+
+
+  
+void setup(){
+
+size(1400,800);            // for second display size = (2000,1080)
+background(#270000);
+
+aPos = new PVector(0,height/2);    // asteroid position intitial
+aVel = new PVector(270000*dt,0);   // asteroid velocity initial (km / s)
+  
+mPos = new PVector(400,height/2);  // moon position initial
+mVel = new PVector(1.04746*dt,0);  // moon velocity initial (km / s)
+
+}
+
+
+
+
+void draw(){
+
+  float d;                            // distance
+  background(#270000);                // grey background
+  
+  mVelMag = mVel.mag() * 1000 / dt;  // moon velocity magnitude (m / s)
+  aVelMag = aVel.mag() * 1000 / dt;  // asteroid velocity magnitude (m / s)
+  
+  if (collision == true) {
+      mVelMag = mVel.mag() * 1000 / dt2;  // moon velocity magnitude (m / s)
+      aVelMag = aVel.mag() * 1000 / dt2;  // asteroid velocity magnitude (m / s)
+}
+  
+  p = (mMass * mVelMag) + (aMass * aVelMag);  // momentum (kgm / s)
+  KE = (0.5 * mMass * mVelMag * mVelMag) + (0.5 * aMass * aVelMag * aVelMag); // kinetic energy (J)
+  
+  if(goOnce == false) {
+    KEOLD = KE;
+    goOnce = true;
+  }
+  
+  if(KENEW == 0) {DELTAKE = 0;}
+  else{
+  DELTAKE = abs(KENEW - KEOLD);
+  }
+  print(DELTAKE + "J \n");
+  
+  finalVel = new PVector(p/(mMass + aMass)* dt2 /1000,0); // final velocity (km / s)
+  
+  aPos.add(aVel);                    // add velocity to the position of asteroid
+  mPos.add(mVel);                    // add velocity to position of moon
+ 
+  noStroke();
+  scale(0.5);
+  fill(#4B4444);                    // create ellipses of moon and asteroid
+  ellipse(aPos.x,aPos.y, 10,10);
+  fill(#837A7A);
+  ellipse(mPos.x,mPos.y,347.62,347.62);
+
+
+  textSize(15);                      // text size
+  fill(255);                         // text colour
+  textAlign(CENTER);
+  text("MOON", mPos.x, mPos.y);           // write "MOON" at the center of the moon
+  text("v = " + mVelMag + " m/s", mPos.x, mPos.y - 100);    // write the moon velocity
+  text("ASTEROID", aPos.x - 60, aPos.y);  // write "ASTEROID" slightly offset from the asteroid
+ 
+  if(collision == false) {
+    fill(#F8FF40);
+    text("TIME: " + dt + " seconds(s) / frame", width - 125, height - 1050);
+    text("KINETIC ENERGY: " + KEOLD + " Joules", width - 150, height - 1030);
+    text("KINETIC ENERGY LOSS: " + DELTAKE + " Joules", width - 155, height - 1010);
+    fill(#17AD1F);
+    text("TOTAL MOMENTUM: " + p + "kgm/s", width - 175, height - 990);
+  }
+  else if(collision == true) {
+       fill(#F8FF40);
+       text("TIME: " + dt2 + " second(s) / frame", width - 125, height - 1050);
+       text("KINETIC ENERGY: " + KENEW + " Joules", width - 150, height - 1030);
+       text("KINETIC ENERGY LOSS: " + DELTAKE + " Joules", width - 155, height - 1010);
+       fill(#17AD1F);
+       text("TOTAL MOMENTUM: " + p + "kgm/s", width - 175, height - 990);
+
+  }
+  
+  d = aPos.dist(mPos);                    // calculate distance
+
+ // print(" ||  Moon velocity = ");
+ // print(mVel.x);
+ // print("km/s\n");
+  
+  if(d < 178.81 && collision == false) {    // if they are touching, give them both the new velocity
+    
+  aVel.sub(aVel);
+  mVel.sub(mVel);  
+  mVel.add(finalVel);
+  aVel.add(finalVel);
+  KENEW = (0.5 *(mMass + aMass) * mVelMag * mVelMag);
+  collision = true;
+
+  
+}
+
+//  if(mPos.x > width + 173.81) {exit();}
+
+
+
+}
